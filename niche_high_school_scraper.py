@@ -11,7 +11,7 @@ import sys
 
 ## Check to see that there are three arguments passed in
 if len(sys.argv) != 3:
-    'Sorry! You need three arguments for this script to work: (1) python niche_high_school_scraper.py (2) <niche_url> (3) <file_name>'
+    print('Sorry! You need three arguments for this script to work: (1) python niche_high_school_scraper.py (2) <niche_url> (3) <file_name>')
     exit(0)
 
 ## Read in sys argument (should be a niche.com search result URL and the file name)
@@ -19,7 +19,7 @@ url = sys.argv[1]
 file_name = sys.argv[2]
 
 if 'niche.com' not in url:
-    'Sorry! This script only works with the website niche.com!'
+    print('Sorry! This script only works with the website niche.com!')
     exit(0)
 
 ## Make a request to the URL and pass in the contents to BeautifulSoup
