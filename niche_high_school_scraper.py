@@ -26,6 +26,42 @@ if 'niche.com' not in url:
 r = requests.get(url)
 s = BeautifulSoup(r.content, 'html.parser')
 
+search_results = s.findAll('div', {'class': 'search-result'})
+
+data = {
+    "School":[],
+    "Address":[]
+}
+
+for s in search_results:
+
+    link = s.findAll('a', {'class': 'search-result__link'})[0]['href']
+    title = s.findAll('h2', {'class': 'search-result__title'})[0].next
+
+    r_inner = requests.get(link)
+    s_inner = BeautifulSoup(r_inner.content, 'html.parser')
+
+    address = s_inner.findAll('div', {'class': 'profile__address'})[0]
+    address_inner_div = address.select('div')[1].select('div')
+    address_inner_split = ''.join(map(str, address_inner_div[1].contents)).split(' ')
+
+    street = address_inner_div[0].next
+    town_city = address_inner_div[1].next
+    state = "".join(map(str, address_inner_div[1].contents))[-9:-7]
+    zip = "".join(map(str, address_inner_div[1].contents))[-5:]
+    mailing_address = '{}, {}, {} {}'.format(street, town_city, state, zip)
+
+    data['School'].append(title)
+    data['Address'].append(mailing_address)
+
+    print('{}|{}'.format(title, mailing_address))
+
+writer = pd.ExcelWriter(file_name + '.xlsx')
+pd_data = pd.DataFrame(data)
+pd_data.to_excel(writer, 'Sheet1', index=False)
+writer.save()
+
+'''
 ## Get all of the school titles and links to each individual school page
 titles = s.findAll('h2', {'class': 'search-result__title'})
 links = s.findAll('a', {'class': 'search-result__link'})
@@ -50,7 +86,7 @@ for t, l in zip(titles, links):
     # Split the address up into street, town/city, state, and zip code
     street = address_inner_div[0].next
     town_city = address_inner_div[1].next
-    state = "".join(map(str, address_inner_div[1].contents))[-10:-8]
+    state = "".join(map(str, address_inner_div[1].contents))[-9:-7]
     zip = "".join(map(str, address_inner_div[1].contents))[-5:]
 
     # Add data to the dictionary
@@ -59,8 +95,10 @@ for t, l in zip(titles, links):
 
     print("{}|{}, {}, {} {}".format(t.next, street, town_city, state, zip))
 
+
 ## Write the data to an .xlsx spreadsheet
 writer = pd.ExcelWriter(file_name + '.xlsx')
 pd_dict = pd.DataFrame(dict)
 pd_dict.to_excel(writer, 'Sheet1', index=False)
 writer.save()
+'''
